@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DAM_Sumativa1</string>
+    <string name="title_activity_login_screen">LoginScreen</string>
+    <string name="title_activity_register_screen">RegisterScreen</string>
+    <string name="title_activity_forgot_password_screen">ForgotPasswordScreen</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_theme_toggle">ThemeToggle</string>
+</resources>
