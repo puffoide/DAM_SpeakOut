@@ -39,7 +39,7 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, 
     ) {
         Text(
             "Bienvenido, ${user.username}",
-            fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value,
+            fontSize = MaterialTheme.typography.displaySmall.fontSize * globalScale.value,
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -64,5 +64,6 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, 
         ) {
             Text("Cerrar Sesión", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
+        ZoomControls(globalScale)
     }
 }
