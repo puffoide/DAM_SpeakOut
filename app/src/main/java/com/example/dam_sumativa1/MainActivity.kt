@@ -1,6 +1,5 @@
 package com.example.dam_sumativa1
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -33,6 +31,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation(isDarkTheme: MutableState<Boolean>) {
     val navController = rememberNavController()
+    val globalScale = remember { mutableStateOf(1f) }
     val userList = remember {
         mutableStateOf(
             mutableListOf(
@@ -47,16 +46,16 @@ fun AppNavigation(isDarkTheme: MutableState<Boolean>) {
         ThemeToggle(isDarkTheme)
         NavHost(navController = navController, startDestination = "login") {
             composable("login") {
-                LoginScreen(navController, userList.value, loggedInUser)
+                LoginScreen(navController, userList.value, loggedInUser, globalScale)
             }
             composable("register") {
-                RegisterScreen(navController, userList.value)
+                RegisterScreen(navController, userList.value, globalScale)
             }
             composable("forgot_password") {
-                ForgotPasswordScreen(navController, userList.value)
+                ForgotPasswordScreen(navController, userList.value, globalScale)
             }
             composable("home") {
-                HomeScreen(navController, loggedInUser)
+                HomeScreen(navController, loggedInUser, globalScale)
             }
         }
     }

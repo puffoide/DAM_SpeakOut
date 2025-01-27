@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -42,7 +43,7 @@ import com.example.dam_sumativa1.modelo.User
 
 
 @Composable
-fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser: MutableState<User?>) {
+fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser: MutableState<User?>, globalScale: MutableState<Float>) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -53,28 +54,33 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
+            .padding((20 * globalScale.value).dp),
         verticalArrangement = Arrangement
             .Center,
         horizontalAlignment = Alignment
             .CenterHorizontally
     ) {
+
         Text(
             "SpeakOut 💬",
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.displayMedium,
+            fontSize = if ((MaterialTheme.typography.displayMedium.fontSize * globalScale.value) > 59.sp) 59.sp
+            else MaterialTheme.typography.displayMedium.fontSize * globalScale.value,
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier
-            .height(24.dp)
-        )
+            .height((40 * globalScale.value).dp))
 
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = {Text("Nombre de usuario")},
+            label = {Text("Nombre de usuario", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = (16 * globalScale.value).dp),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                     MaterialTheme.colorScheme.onSurface,
                     MaterialTheme.colorScheme.primary
@@ -83,12 +89,15 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text("Contraseña", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)},
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = (16 * globalScale.value).dp),
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                 MaterialTheme.colorScheme.onSurface,
                 MaterialTheme.colorScheme.primary
@@ -97,7 +106,8 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
                 IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                     Icon(
                         imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                        contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                        modifier = Modifier.size((24 * globalScale.value).dp)
                     )
                 }
             }
@@ -105,18 +115,19 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = (16 * globalScale.value).dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
                 checked = rememberUser,
                 onCheckedChange = { rememberUser = it },
-                colors = CheckboxDefaults.colors(MaterialTheme.colorScheme.primary)
+                colors = CheckboxDefaults.colors(MaterialTheme.colorScheme.primary),
+                modifier = Modifier.size((24 * globalScale.value).dp)
             )
             Text(
                 text = "Recordar usuario",
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = 8.dp)
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
             )
         }
 
@@ -129,14 +140,15 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
                 errorMessage = "El usuario/contraseña son incorrectos"
             }
         }, modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(bottom = (16 * globalScale.value).dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )) {
-            Text("Ingresar")
+            Text("Ingresar", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
-        Text(errorMessage, color = MaterialTheme.colorScheme.error)
+        Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
         Spacer(modifier = Modifier
             .height(8.dp))
         Row(
@@ -146,15 +158,18 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
             Alignment.CenterVertically
 
         ) {
-            Text("¿Eres nuevo?", color = MaterialTheme.colorScheme.onBackground)
+            Text("¿Eres nuevo?", color = MaterialTheme.colorScheme.onBackground, fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
             TextButton(onClick = { navController.navigate("register")}) {
-                Text("Regístrate", fontSize = 16.sp)
+                Text("Regístrate", fontSize = 16.sp * globalScale.value)
             }
         }
 
         TextButton(onClick = { navController.navigate("forgot_password")}) {
-            Text("¿Olvidaste tu contraseña?")
+            Text("¿Olvidaste tu contraseña?", fontSize = 16.sp * globalScale.value)
         }
+        Spacer(modifier = Modifier
+            .height(8.dp))
+        ZoomControls(globalScale)
 
     }
 

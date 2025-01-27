@@ -5,4 +5,5 @@
     <string name="title_activity_forgot_password_screen">ForgotPasswordScreen</string>
     <string name="title_activity_home_screen">HomeScreen</string>
     <string name="title_activity_theme_toggle">ThemeToggle</string>
+    <string name="title_activity_zoom_controls">ZoomControls</string>
 </resources>

@@ -21,7 +21,7 @@ import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
 
 @Composable
-fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>) {
+fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, globalScale: MutableState<Float>) {
     val user = loggedInUser.value
     if (user == null) {
         navController.navigate("login")
@@ -32,18 +32,20 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>) 
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
+            .padding((20 * globalScale.value).dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             "Bienvenido, ${user.username}",
-            style = MaterialTheme.typography.headlineLarge,
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value,
+            style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             "Correo: ${user.email}",
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -60,7 +62,7 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>) 
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Cerrar Sesión")
+            Text("Cerrar Sesión", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
     }
 }

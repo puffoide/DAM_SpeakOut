@@ -17,6 +17,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,11 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
 
 @Composable
-fun ForgotPasswordScreen(navController: NavController, userList: List<User>) {
+fun ForgotPasswordScreen(navController: NavController, userList: List<User>, globalScale: MutableState<Float>) {
     var identifier by remember { mutableStateOf("") }
     var messageError by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -38,23 +40,28 @@ fun ForgotPasswordScreen(navController: NavController, userList: List<User>) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding((20 * globalScale.value).dp),
+        verticalArrangement = Arrangement
+            .Center,
+        horizontalAlignment = Alignment
+            .CenterHorizontally
     ) {
         Text(
             "Recuperar Contraseña",
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
         TextField(
             value = identifier,
             onValueChange = { identifier = it },
-            label = { Text("Nombre de usuario o correo") },
+            label = { Text("Nombre de usuario o correo", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                 MaterialTheme.colorScheme.onSurface,
                 MaterialTheme.colorScheme.primary
@@ -71,7 +78,7 @@ fun ForgotPasswordScreen(navController: NavController, userList: List<User>) {
                         "Se ha enviado un correo de recuperación.",
                         Toast.LENGTH_LONG
                     ).show()
-                    messageError = "" // Limpia errores si encuentra el usuario
+                    messageError = ""
                 } else {
                     messageError = "Usuario o correo no encontrado."
                 }
@@ -82,18 +89,19 @@ fun ForgotPasswordScreen(navController: NavController, userList: List<User>) {
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Recuperar contraseña")
+            Text("Recuperar contraseña", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
 
         if (messageError.isNotBlank()) {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(messageError, color = MaterialTheme.colorScheme.error)
+            Text(messageError, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = { navController.navigate("login") }) {
-            Text("Volver al inicio")
+            Text("Volver al inicio", fontSize = 16.sp * globalScale.value)
         }
+        ZoomControls(globalScale)
     }
 }
 

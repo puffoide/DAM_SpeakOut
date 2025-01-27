@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +36,7 @@ import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
 
 @Composable
-fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
+fun RegisterScreen(navController: NavController, userList: MutableList<User>, globalScale: MutableState<Float>) {
     val keyBoardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
     var username by remember { mutableStateOf("") }
@@ -48,13 +49,15 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding((20 * globalScale.value).dp),
+        verticalArrangement = Arrangement
+            .Center,
+        horizontalAlignment = Alignment
+            .CenterHorizontally
     ) {
         Text(
             "Registro de Usuario",
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
@@ -63,10 +66,13 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Nombre de usuario") },
+            label = { Text("Nombre de usuario", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                 MaterialTheme.colorScheme.onSurface,
                 MaterialTheme.colorScheme.primary
@@ -76,10 +82,13 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
+            label = { Text("Correo electrónico", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                 MaterialTheme.colorScheme.onSurface,
                 MaterialTheme.colorScheme.primary
@@ -89,12 +98,15 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text("Contraseña", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                 MaterialTheme.colorScheme.onSurface,
                 MaterialTheme.colorScheme.primary
@@ -104,12 +116,15 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
         TextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar contraseña") },
+            label = { Text("Confirmar contraseña", fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            ),
             colors = TextFieldDefaults.colors(
                 MaterialTheme.colorScheme.onSurface,
                 MaterialTheme.colorScheme.primary
@@ -144,21 +159,23 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>) {
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Registrarse")
+            Text("Registrarse", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
 
-        Text(errorMessage, color = MaterialTheme.colorScheme.error)
+        Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
         Spacer(modifier = Modifier.height(8.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("¿Ya tienes cuenta?", color = MaterialTheme.colorScheme.onBackground)
+            Text("¿Ya tienes cuenta?", color = MaterialTheme.colorScheme.onBackground, fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
             TextButton(onClick = { navController.navigate("login") }) {
-                Text("Inicia sesión", fontSize = 16.sp)
+                Text("Inicia sesión", fontSize = 16.sp * globalScale.value)
             }
         }
+        ZoomControls(globalScale)
     }
 }
 
