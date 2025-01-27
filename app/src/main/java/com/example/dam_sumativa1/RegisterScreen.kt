@@ -34,10 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.utils.manejarResultado
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavController, userList: MutableList<User>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
+fun RegisterScreen(navController: NavController, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     val keyBoardController = LocalSoftwareKeyboardController.current
     val coroutineScope = rememberCoroutineScope()
     var username by remember { mutableStateOf("") }
@@ -136,25 +137,35 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>, sn
         Button(
             onClick = {
                 keyBoardController?.hide()
-                when {
-                    username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() ->
-                        errorMessage = "Todos los campos son obligatorios"
-                    !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
-                        errorMessage = "Formato de correo no válido"
-                    User.buscarUserPorUsername(username) != null || User.buscarUserPorEmail(email) != null ->
-                        errorMessage = "El usuario o correo ya existe"
-                    !validatePassword(password) ->
-                        errorMessage = "La contraseña debe tener al menos 8 caracteres, incluir letras y números."
-                    password != confirmPassword ->
-                        errorMessage = "Las contraseñas no coinciden"
-                    else -> {
-                        User.agregarUser(User(username, email, password))
+                manejarResultado(
+                    operacion = {
+                        when {
+                            username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() ->
+                                throw Exception("Todos los campos son obligatorios")
+                            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                                throw Exception("Correo inválido")
+                            User.buscarUserPorUsername(username) != null || User.buscarUserPorEmail(email) != null ->
+                                throw Exception("Usuario ya existe")
+                            !validatePassword(password) ->
+                                throw Exception("La contraseña debe tener al menos 8 caracteres, incluir letras y números.")
+                            password != confirmPassword ->
+                                throw Exception("Las contraseñas no coinciden")
+                            else -> {
+                                User.agregarUser(User(username, email, password))
+                                true
+                            }
+                        }
+                    },
+                    onSuccess = {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar("Registro exitoso")
                         }
                         navController.navigate("login")
+                    },
+                    onError = { mensajeError ->
+                        errorMessage = mensajeError
                     }
-                }
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -164,9 +175,10 @@ fun RegisterScreen(navController: NavController, userList: MutableList<User>, sn
         ) {
             Text("Registrarse", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
-
+        if (errorMessage.isNotBlank()) {
         Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
         Spacer(modifier = Modifier.height(8.dp))
+         }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

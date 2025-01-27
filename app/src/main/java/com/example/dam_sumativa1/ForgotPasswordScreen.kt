@@ -33,10 +33,11 @@ import com.example.dam_sumativa1.modelo.User
 import kotlinx.coroutines.launch
 
 @Composable
-fun ForgotPasswordScreen(navController: NavController, userList: List<User>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
+fun ForgotPasswordScreen(navController: NavController, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     var identifier by remember { mutableStateOf("") }
-    var messageError by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+
 
     Column(
         modifier = Modifier
@@ -74,13 +75,16 @@ fun ForgotPasswordScreen(navController: NavController, userList: List<User>, sna
         Button(
             onClick = {
                 val user = User.buscarUserPorUsername(identifier) ?: User.buscarUserPorEmail(identifier)
-                if (user != null) {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Se ha enviado un correo de recuperación.")
+                try {
+                    if (user != null) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Se ha enviado un correo de recuperación.")
+                        }
+                    } else {
+                        throw Exception("Usuario o correo no encontrado.")
                     }
-                    messageError = ""
-                } else {
-                    messageError = "Usuario o correo no encontrado."
+                } catch (e: Exception) {
+                    errorMessage = e.message ?: "Error desconocido"
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -92,9 +96,9 @@ fun ForgotPasswordScreen(navController: NavController, userList: List<User>, sna
             Text("Recuperar contraseña", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
 
-        if (messageError.isNotBlank()) {
+        if (errorMessage.isNotBlank()) {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(messageError, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
+            Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
         }
 
         Spacer(modifier = Modifier.height(8.dp))

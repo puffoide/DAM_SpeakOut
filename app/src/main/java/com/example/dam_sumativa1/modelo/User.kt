@@ -20,6 +20,8 @@ data class User(
             return listaUsuarios.find { it.email.equals(email, ignoreCase = true) }
         }
 
-        fun obtenerUsers(): List<User> = listaUsuarios
+        fun filtrarUsuarios(usuarios: List<User>, criterio: (User) -> Boolean): List<User> {
+            return usuarios.filter(criterio)
+        }
     }
 }

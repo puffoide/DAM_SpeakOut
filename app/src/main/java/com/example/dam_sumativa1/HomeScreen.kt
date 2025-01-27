@@ -54,7 +54,6 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, 
 
         Button(
             onClick = {
-                loggedInUser.value = null
                 navController.navigate("login")
             },
             modifier = Modifier.fillMaxWidth(),

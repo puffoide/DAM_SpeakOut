@@ -41,10 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.utils.manejarResultado
 
 
 @Composable
-fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser: MutableState<User?>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
+fun LoginScreen(navController: NavController, loggedInUser: MutableState<User?>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -133,13 +134,23 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
         }
 
         Button(onClick = {
-            val user = User.buscarUserPorUsername(username)?.takeIf { it.password == password }
-            if (user != null) {
-                loggedInUser.value = user
-                navController.navigate("home")
-            } else {
-                errorMessage = "El usuario/contraseña son incorrectos"
-            }
+            manejarResultado(
+                operacion = {
+                    val user = User.buscarUserPorUsername(username)?.takeIf { it.password == password }
+                    if (user != null) {
+                        loggedInUser.value = user
+                        true
+                    } else {
+                        throw Exception("El usuario/contraseña son incorrectos")
+                    }
+                },
+                onSuccess = {
+                    navController.navigate("home")
+                },
+                onError = { mensajeError ->
+                    errorMessage = mensajeError
+                }
+            )
         }, modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = (16 * globalScale.value).dp),
@@ -149,9 +160,17 @@ fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser
             )) {
             Text("Ingresar", fontSize = MaterialTheme.typography.bodyLarge.fontSize * globalScale.value)
         }
-        Text(errorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value)
-        Spacer(modifier = Modifier
-            .height(8.dp))
+        if (errorMessage.isNotBlank()) {
+            Text(
+                errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize * globalScale.value
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp)
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

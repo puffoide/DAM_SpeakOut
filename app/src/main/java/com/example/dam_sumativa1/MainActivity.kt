@@ -12,6 +12,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,15 +40,15 @@ fun AppNavigation(isDarkTheme: MutableState<Boolean>) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     val globalScale = remember { mutableStateOf(1f) }
-    val userList = remember {
-        mutableStateOf(
-            mutableListOf(
-                User("admin", "admin@ejemplo.com", "admin123"),
-                User("testuser", "test@ejemplo.com", "test123")
-            )
-        )
-    }
     val loggedInUser = remember { mutableStateOf<User?>(null) }
+
+    SideEffect {
+        User.agregarUser(User("admin", "admin@ejemplo.com", "admin123"))
+        User.agregarUser(User("testuser1", "user1@ejemplo.com", "password1"))
+        User.agregarUser(User("testuser2", "user2@ejemplo.com", "password2"))
+        User.agregarUser(User("testuser3", "user3@ejemplo.com", "password3"))
+        User.agregarUser(User("testuser4", "user4@ejemplo.com", "password4"))
+    }
 
     Scaffold (snackbarHost = { SnackbarHost(hostState = snackbarHostState) })
     { paddingValues ->
@@ -59,13 +60,13 @@ fun AppNavigation(isDarkTheme: MutableState<Boolean>) {
             ThemeToggle(isDarkTheme)
             NavHost(navController = navController, startDestination = "login") {
                 composable("login") {
-                    LoginScreen(navController, userList.value, loggedInUser, snackbarHostState, globalScale)
+                    LoginScreen(navController, loggedInUser, snackbarHostState, globalScale)
                 }
                 composable("register") {
-                    RegisterScreen(navController, userList.value, snackbarHostState, globalScale)
+                    RegisterScreen(navController, snackbarHostState, globalScale)
                 }
                 composable("forgot_password") {
-                    ForgotPasswordScreen(navController, userList.value, snackbarHostState, globalScale)
+                    ForgotPasswordScreen(navController, snackbarHostState, globalScale)
                 }
                 composable("home") {
                     HomeScreen(navController, loggedInUser, snackbarHostState, globalScale)
