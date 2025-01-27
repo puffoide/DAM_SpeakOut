@@ -1,6 +1,5 @@
 package com.example.dam_sumativa1
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -21,20 +22,21 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import kotlinx.coroutines.launch
 
 @Composable
-fun ForgotPasswordScreen(navController: NavController, userList: List<User>, globalScale: MutableState<Float>) {
+fun ForgotPasswordScreen(navController: NavController, userList: List<User>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     var identifier by remember { mutableStateOf("") }
     var messageError by remember { mutableStateOf("") }
-    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -73,11 +75,9 @@ fun ForgotPasswordScreen(navController: NavController, userList: List<User>, glo
             onClick = {
                 val user = User.buscarUserPorUsername(identifier) ?: User.buscarUserPorEmail(identifier)
                 if (user != null) {
-                    Toast.makeText(
-                        context,
-                        "Se ha enviado un correo de recuperación.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Se ha enviado un correo de recuperación.")
+                    }
                     messageError = ""
                 } else {
                     messageError = "Usuario o correo no encontrado."

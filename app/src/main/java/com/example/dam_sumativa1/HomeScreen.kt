@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -21,7 +22,7 @@ import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
 
 @Composable
-fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, globalScale: MutableState<Float>) {
+fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     val user = loggedInUser.value
     if (user == null) {
         navController.navigate("login")

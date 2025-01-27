@@ -21,6 +21,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -43,7 +44,7 @@ import com.example.dam_sumativa1.modelo.User
 
 
 @Composable
-fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser: MutableState<User?>, globalScale: MutableState<Float>) {
+fun LoginScreen(navController: NavController, userList: List<User>, loggedInUser: MutableState<User?>, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
