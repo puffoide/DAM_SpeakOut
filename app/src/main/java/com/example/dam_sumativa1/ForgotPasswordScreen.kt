@@ -37,13 +37,13 @@ fun ForgotPasswordScreen(navController: NavController, snackbarHostState: Snackb
     var identifier by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
-
+    val maxSize = 26
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding((20 * globalScale.value).dp),
+            .padding( minOf((20 * globalScale.value).toInt(), maxSize).dp),
         verticalArrangement = Arrangement
             .Center,
         horizontalAlignment = Alignment

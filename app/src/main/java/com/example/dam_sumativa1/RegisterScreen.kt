@@ -46,12 +46,13 @@ fun RegisterScreen(navController: NavController, snackbarHostState: SnackbarHost
     var confirmPassword by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    val maxSize = 26
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding((20 * globalScale.value).dp),
+            .padding( minOf((20 * globalScale.value).toInt(), maxSize).dp),
         verticalArrangement = Arrangement
             .Center,
         horizontalAlignment = Alignment
