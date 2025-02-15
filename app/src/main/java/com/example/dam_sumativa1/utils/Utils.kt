@@ -1,17 +1,20 @@
 package com.example.dam_sumativa1.utils
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 fun manejarResultado(
-    operacion: () -> Boolean,
+    scope: CoroutineScope,
+    operacion: suspend () -> Unit,
     onSuccess: () -> Unit,
     onError: (String) -> Unit
 ) {
-    try {
-        if (operacion()) {
+    scope.launch {
+        try {
+            operacion()
             onSuccess()
-        } else {
-            onError("Ocurrió un error inesperado.")
+        } catch (e: Exception) {
+            onError(e.message ?: "Error desconocido")
         }
-    } catch (e: Exception) {
-        onError(e.message ?: "Error desconocido")
     }
 }

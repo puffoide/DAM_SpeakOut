@@ -30,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -39,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -50,8 +52,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.services.UserService
 import com.example.dam_sumativa1.utils.manejarResultado
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 @Composable
@@ -61,8 +67,10 @@ fun LoginScreen(navController: NavController, loggedInUser: MutableState<User?>,
     var errorMessage by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var rememberUser by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
     val imageId = R.drawable.speakout_icon
+    val userService = remember { UserService() }
+    val coroutineScope = rememberCoroutineScope()
+    val keyBoardController = LocalSoftwareKeyboardController.current
 
     val annotatedString = buildAnnotatedString {
         append("SpeakOut ")
@@ -87,6 +95,13 @@ fun LoginScreen(navController: NavController, loggedInUser: MutableState<User?>,
         }
     )
 
+    LaunchedEffect(loggedInUser.value) {
+        if (loggedInUser.value != null) {
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -169,28 +184,50 @@ fun LoginScreen(navController: NavController, loggedInUser: MutableState<User?>,
             )
         }
 
-        Button(onClick = {
-            manejarResultado(
-                operacion = {
-                    val user = User.buscarUserPorUsername(username)?.takeIf { it.password == password }
-                    if (user != null) {
-                        loggedInUser.value = user
-                        true
-                    } else {
-                        throw Exception("El usuario/contraseña son incorrectos")
+        Button(
+            onClick = {
+                keyBoardController?.hide()
+                manejarResultado(
+                    scope = coroutineScope,
+                    operacion = {
+                        when {
+                            username.isBlank() -> throw Exception("Debe ingresar el nombre de usuario.")
+                            password.isBlank() -> throw Exception("Debe ingresar la contraseña.")
+                            else -> {
+                                val user = userService.buscarUserPorUsername(username)
+                                    ?: throw Exception("No se encontró el usuario con ese nombre.")
+
+                                suspendCoroutine<Unit> { continuation ->
+                                    userService.iniciarSesion(
+                                        user.email,
+                                        password
+                                    ) { userLogged, error ->
+                                        if (userLogged != null) {
+                                            loggedInUser.value = userLogged
+                                            continuation.resume(Unit)
+                                        } else {
+                                            continuation.resumeWithException(
+                                                Exception(
+                                                    error ?: "Error desconocido"
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    onSuccess = {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Ingreso exitoso!")
+                        }
+                        navController.navigate("home")
+                    },
+                    onError = { mensajeError ->
+                        errorMessage = mensajeError
                     }
-                },
-                onSuccess = {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Ingreso exitoso!")
-                    }
-                    navController.navigate("home")
-                },
-                onError = { mensajeError ->
-                    errorMessage = mensajeError
-                }
-            )
-        }, modifier = Modifier
+                )
+            }, modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = (16 * globalScale.value).dp),
             colors = ButtonDefaults.buttonColors(

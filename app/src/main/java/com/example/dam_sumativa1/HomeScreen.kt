@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.services.UserService
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,23 +27,36 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, 
 ) {
     val coroutineScope = rememberCoroutineScope()
     val user = loggedInUser.value
+    val userService = remember { UserService() }
+
+    var shouldNavigateToLogin by remember { mutableStateOf(false) }
+
+    LaunchedEffect(user) {
+        if (user == null) {
+            shouldNavigateToLogin = true
+        }
+    }
+
+    LaunchedEffect(shouldNavigateToLogin) {
+        if (shouldNavigateToLogin) {
+            userService.cerrarSesion()
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
+            }
+        }
+    }
+
     if (user == null) {
-        navController.navigate("login")
         return
     }
 
     var showProfileDetails by remember { mutableStateOf(false) }
     var selectedScreen by remember { mutableStateOf("Bienvenido, ${user.username}") }
-    val topBarTitle = if (showProfileDetails) {
-        "Bienvenido, ${user.username}"
-    } else {
-        selectedScreen
-    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(topBarTitle) },
+                title = { Text(selectedScreen) },
                 actions = {
                     IconButton(onClick = { showProfileDetails = !showProfileDetails }) {
                         Icon(
@@ -103,10 +117,11 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, 
                         Button(
                             onClick = {
                                 loggedInUser.value = null
+                                userService.cerrarSesion()
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Registro exitoso")
+                                    snackbarHostState.showSnackbar("Sesión cerrada")
                                 }
-                                navController.navigate("login")
+                                shouldNavigateToLogin = true
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
@@ -143,7 +158,7 @@ fun BottomNavigationBar(selectedScreen: String, onScreenSelected: (String) -> Un
                 icon = { Icon(imageVector = icon, contentDescription = null) },
                 label = { Text(route) },
                 selected = selectedScreen == route,
-                onClick = { onScreenSelected(route) } // 🔹 Cierra el perfil al cambiar de pantalla
+                onClick = { onScreenSelected(route) }
             )
         }
     }

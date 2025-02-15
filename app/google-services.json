@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "413575848836",
+    "firebase_url": "https://damspeakout-default-rtdb.firebaseio.com",
+    "project_id": "damspeakout",
+    "storage_bucket": "damspeakout.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413575848836:android:252508777dedb252ddb3d1",
+        "android_client_info": {
+          "package_name": "com.example.dam_sumativa1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSNFkuQE2-XrpaUwCh3BJ2FiodxHwilqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

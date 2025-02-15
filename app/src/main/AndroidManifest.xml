@@ -23,36 +23,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDZ90BPhxBYTUN9r0CSafEwBXBvPFTZUt8"/>
         <activity
-            android:name=".ZoomControls"
-            android:exported="false"
-            android:label="@string/title_activity_zoom_controls"
-            android:theme="@style/Theme.DAM_Sumativa1" />
-        <activity
-            android:name=".ThemeToggle"
-            android:exported="false"
-            android:label="@string/title_activity_theme_toggle"
-            android:theme="@style/Theme.DAM_Sumativa1" />
-        <activity
-            android:name=".HomeScreen"
-            android:exported="false"
-            android:label="@string/title_activity_home_screen"
-            android:theme="@style/Theme.DAM_Sumativa1" />
-        <activity
-            android:name=".ForgotPasswordScreen"
-            android:exported="false"
-            android:label="@string/title_activity_forgot_password_screen"
-            android:theme="@style/Theme.DAM_Sumativa1" />
-        <activity
-            android:name=".RegisterScreen"
-            android:exported="false"
-            android:label="@string/title_activity_register_screen"
-            android:theme="@style/Theme.DAM_Sumativa1" />
-        <activity
-            android:name=".LoginScreen"
-            android:exported="false"
-            android:label="@string/title_activity_login_screen"
-            android:theme="@style/Theme.DAM_Sumativa1" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

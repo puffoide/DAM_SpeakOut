@@ -1,6 +1,7 @@
 package com.example.dam_sumativa1
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
@@ -20,12 +22,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.services.UserService
 import com.example.dam_sumativa1.ui.theme.DAM_Sumativa1Theme
+import com.google.firebase.FirebaseApp
+import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             val isDarkTheme = remember { mutableStateOf(false) }
             DAM_Sumativa1Theme(darkTheme = isDarkTheme.value) {
@@ -42,17 +48,9 @@ fun AppNavigation(isDarkTheme: MutableState<Boolean>) {
     val globalScale = remember { mutableStateOf(1f) }
     val loggedInUser = remember { mutableStateOf<User?>(null) }
 
-    SideEffect {
-        User.agregarUser(User("admin", "admin@ejemplo.com", "admin123"))
-        User.agregarUser(User("testuser1", "user1@ejemplo.com", "password1"))
-        User.agregarUser(User("testuser2", "user2@ejemplo.com", "password2"))
-        User.agregarUser(User("testuser3", "user3@ejemplo.com", "password3"))
-        User.agregarUser(User("testuser4", "user4@ejemplo.com", "password4"))
-    }
 
-    Scaffold (snackbarHost = { SnackbarHost(hostState = snackbarHostState) })
-    { paddingValues ->
-        Column (
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxWidth()
@@ -72,8 +70,6 @@ fun AppNavigation(isDarkTheme: MutableState<Boolean>) {
                     HomeScreen(navController, loggedInUser, snackbarHostState, globalScale)
                 }
             }
-
         }
     }
-
 }

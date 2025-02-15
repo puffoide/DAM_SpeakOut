@@ -26,10 +26,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.services.UserService
+import com.example.dam_sumativa1.utils.manejarResultado
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,6 +40,8 @@ fun ForgotPasswordScreen(navController: NavController, snackbarHostState: Snackb
     var identifier by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val userService = remember { UserService() }
+    val keyBoardController = LocalSoftwareKeyboardController.current
     val maxSize = 26
 
     Column(
@@ -74,18 +79,30 @@ fun ForgotPasswordScreen(navController: NavController, snackbarHostState: Snackb
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                val user = User.buscarUserPorUsername(identifier) ?: User.buscarUserPorEmail(identifier)
-                try {
-                    if (user != null) {
+                keyBoardController?.hide()
+                manejarResultado(
+                    scope = coroutineScope,
+                    operacion = {
+                        when {
+                            identifier.isBlank() -> throw Exception("Debe ingresar un correo o nombre de usuario.")
+                            else -> {
+                                val user = userService.buscarUsuarioPorIdentificador(identifier)
+                                if (user == null) {
+                                    throw Exception("El usuario o correo no está registrado en el sistema.")
+                                }
+                                userService.enviarCorreoRecuperacion(user.email)
+                            }
+                        }
+                    },
+                    onSuccess = {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar("Se ha enviado un correo de recuperación.")
                         }
-                    } else {
-                        throw Exception("Usuario o correo no encontrado.")
+                    },
+                    onError = { mensajeError ->
+                        errorMessage = mensajeError
                     }
-                } catch (e: Exception) {
-                    errorMessage = e.message ?: "Error desconocido"
-                }
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(

@@ -34,12 +34,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dam_sumativa1.modelo.User
+import com.example.dam_sumativa1.services.UserService
 import com.example.dam_sumativa1.utils.manejarResultado
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun RegisterScreen(navController: NavController, snackbarHostState: SnackbarHostState, globalScale: MutableState<Float>) {
     val keyBoardController = LocalSoftwareKeyboardController.current
+    val userService = remember { UserService() }
     val coroutineScope = rememberCoroutineScope()
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -139,27 +144,41 @@ fun RegisterScreen(navController: NavController, snackbarHostState: SnackbarHost
             onClick = {
                 keyBoardController?.hide()
                 manejarResultado(
+                    scope = coroutineScope,
                     operacion = {
                         when {
                             username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() ->
                                 throw Exception("Todos los campos son obligatorios")
+
                             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
                                 throw Exception("Correo inválido")
-                            User.buscarUserPorUsername(username) != null || User.buscarUserPorEmail(email) != null ->
-                                throw Exception("Usuario ya existe")
+
                             !validatePassword(password) ->
                                 throw Exception("La contraseña debe tener al menos 8 caracteres, incluir letras y números.")
+
                             password != confirmPassword ->
                                 throw Exception("Las contraseñas no coinciden")
+
                             else -> {
-                                User.agregarUser(User(username, email, password))
-                                true
+                                userService.verificarUsuarioEnFirebase(username, email)
+
+                                val resultado = suspendCoroutine<Result<Unit>> { continuation ->
+                                    userService.registrarUsuario(username, email, password) { success, error ->
+                                        if (success) {
+                                            continuation.resume(Result.success(Unit))
+                                        } else {
+                                            continuation.resumeWithException(Exception(error ?: "Error desconocido"))
+                                        }
+                                    }
+                                }
+
+                                resultado.getOrThrow()
                             }
                         }
                     },
                     onSuccess = {
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Registro exitoso")
+                            snackbarHostState.showSnackbar("Registro exitoso!")
                         }
                         navController.navigate("login")
                     },
