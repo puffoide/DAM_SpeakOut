@@ -10,30 +10,43 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun VoiceRecorderScreen(navController: NavController){
+fun VoiceRecorderScreen(navController: NavController) {
     val context = LocalContext.current
     val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
-    var speechText by remember { mutableStateOf("Presione el boton y habla") }
+    var speechText by remember { mutableStateOf("Presione el botón y hable") }
+    var isListening by remember { mutableStateOf(false) }
+    var isProcessing by remember { mutableStateOf(false) }
 
+    val micColor by animateColorAsState(
+        targetValue = when {
+            isListening -> Color.Red
+            isProcessing -> Color.Gray
+            else -> MaterialTheme.colorScheme.primary
+        },
+        label = "Mic Color Animation"
+    )
+
+    val micSize by animateFloatAsState(
+        targetValue = if (isListening) 64f else 55f,
+        label = "Mic Size Animation"
+    )
 
     val recognizerIntent = remember {
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -42,85 +55,82 @@ fun VoiceRecorderScreen(navController: NavController){
         }
     }
 
-    val permissionLaincher = rememberLauncherForActivityResult(
+    val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if(isGranted){
+        if (isGranted && !isProcessing) {
+            isProcessing = true
             speechRecognizer.startListening(recognizerIntent)
-        }
-        else{
-            Toast.makeText(context,"Persmisos del microfono denegados", Toast.LENGTH_LONG).show()
+        } else if (!isGranted) {
+            Toast.makeText(context, "Permisos del micrófono denegados", Toast.LENGTH_LONG).show()
         }
     }
 
     val recognizerListener = object : RecognitionListener {
-        override fun onReadyForSpeech(p0: Bundle?) {
-            Log.d("SpeechReconicer", "Listo para esuchar!")
+        override fun onReadyForSpeech(params: Bundle?) {
+            Log.d("SpeechRecognizer", "Listo para escuchar!")
+            isListening = true
         }
 
         override fun onBeginningOfSpeech() {
-            speechText = "Escuchando ..... ...."
+            speechText = "Escuchando..."
         }
 
-        override fun onRmsChanged(p0: Float) {
-            Log.d("SpeechReconicer", "Listo para esuchar!")
-        }
+        override fun onRmsChanged(rmsdB: Float) {}
 
-        override fun onBufferReceived(p0: ByteArray?) {
-            Log.d("SpeechReconicer", "Listo para esuchar!")
-        }
+        override fun onBufferReceived(buffer: ByteArray?) {}
 
         override fun onEndOfSpeech() {
-            speechText = "Procesando ....."
+            speechText = "Procesando..."
+            isListening = false
         }
 
-        override fun onError(p0: Int) {
-            speechText = "Error al reconocer la Voz"
+        override fun onError(error: Int) {
+            speechText = "Error al reconocer la voz"
+            isListening = false
+            isProcessing = false
         }
 
-        override fun onResults(p0: Bundle?) {
-            val matches = p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        override fun onResults(results: Bundle?) {
+            val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
             speechText = matches?.firstOrNull() ?: "No se pudo reconocer"
-
+            isListening = false
+            isProcessing = false
         }
 
-        override fun onPartialResults(p0: Bundle?) {
-            Log.d("SpeechReconicer", "Listo para esuchar!")
-        }
+        override fun onPartialResults(partialResults: Bundle?) {}
 
-        override fun onEvent(p0: Int, p1: Bundle?) {
-            Log.d("SpeechReconicer", "Listo para esuchar!")
-        }
-
+        override fun onEvent(eventType: Int, params: Bundle?) {}
     }
 
     speechRecognizer.setRecognitionListener(recognizerListener)
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
-
+    ) {
         Text(
-            text =  speechText,
+            text = speechText,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 16.dp)
-
         )
-        Button(
-            onClick = {
-                permissionLaincher.launch(Manifest.permission.RECORD_AUDIO)
-            }
+
+        IconButton(
+            onClick = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+            modifier = Modifier
+                .size(micSize.dp)
+                .padding(8.dp),
+            colors = IconButtonDefaults.filledIconButtonColors(containerColor = micColor),
+            enabled = !isProcessing
         ) {
-            Text(text = "Presionar y Hablar")
+            Icon(
+                imageVector = if (isListening) Icons.Default.Mic else Icons.Default.MicOff,
+                contentDescription = "Micrófono",
+                tint = Color.White
+            )
         }
-
-
     }
-
-
-
 }
