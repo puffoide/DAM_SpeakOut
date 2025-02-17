@@ -1,6 +1,5 @@
 package com.example.dam_sumativa1.services
 
-import android.util.Log
 import com.example.dam_sumativa1.modelo.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -8,7 +7,6 @@ import com.google.firebase.database.*
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class UserService {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()

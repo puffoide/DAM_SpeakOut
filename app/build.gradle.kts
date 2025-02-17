@@ -54,11 +54,12 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
 
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
@@ -79,5 +80,16 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
 
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.7")
+
+    // JUnit para pruebas unitarias
+    testImplementation("junit:junit:4.13.2")
+
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("io.mockk:mockk:1.13.5")
+    // Robolectric para pruebas en JVM sin emulador
+    testImplementation("org.robolectric:robolectric:4.9")
+
+
 
 }
