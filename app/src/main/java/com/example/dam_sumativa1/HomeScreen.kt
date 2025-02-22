@@ -138,8 +138,8 @@ fun HomeScreen(navController: NavController, loggedInUser: MutableState<User?>, 
             Spacer(modifier = Modifier.height(16.dp))
 
             when (selectedScreen) {
-                "Texto a voz" -> TextToSpeechScreen(navController)
-                "Voz a texto" -> VoiceRecorderScreen(navController)
+                "Texto a voz" -> TextToSpeechScreen(navController, user)
+                "Voz a texto" -> VoiceRecorderScreen(navController, user)
                 "Buscar dispositivo" -> MapaUbicacionScreen(navController)
             }
         }

@@ -135,7 +135,6 @@ class UserService {
             }
     }
 
-
     suspend fun verificarUsuarioEnFirebase(username: String, email: String) {
         val user = buscarUserPorUsername(username)
         if (user != null) {
@@ -147,4 +146,49 @@ class UserService {
             throw Exception("El correo ya está en uso.")
         }
     }
+
+    suspend fun agregarTexto(uid: String, newText: String) {
+        val userRef = database.child(uid)
+        userRef.get().addOnSuccessListener { snapshot ->
+            val user = snapshot.getValue(User::class.java)
+            if (user != null) {
+                val updatedTexts = user.savedTexts.toMutableList().apply { add(newText) }
+                userRef.child("savedTexts").setValue(updatedTexts)
+            }
+        }
+    }
+
+    suspend fun eliminarTexto(uid: String, text: String) {
+        val userRef = database.child(uid)
+        userRef.get().addOnSuccessListener { snapshot ->
+            val user = snapshot.getValue(User::class.java)
+            if (user != null) {
+                val updatedTexts = user.savedTexts.toMutableList().apply { remove(text) }
+                userRef.child("savedTexts").setValue(updatedTexts)
+            }
+        }
+    }
+
+    suspend fun actualizarTexto(uid: String, oldText: String, newText: String) {
+        val userRef = database.child(uid)
+        userRef.get().addOnSuccessListener { snapshot ->
+            val user = snapshot.getValue(User::class.java)
+            if (user != null) {
+                val updatedTexts = user.savedTexts.toMutableList().map { if (it == oldText) newText else it }
+                userRef.child("savedTexts").setValue(updatedTexts)
+            }
+        }
+    }
+
+    fun obtenerTextos(userId: String, callback: (List<String>) -> Unit) {
+        database.child(userId).child("savedTexts").get()
+            .addOnSuccessListener { snapshot ->
+                val texts = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                callback(texts)
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
+
 }
