@@ -44,7 +44,7 @@ El propósito de SpeakOut es proporcionar un sistema de apoyo inclusivo que perm
 ### **Requisitos Previos**:
 - Android Studio Arctic Fox o superior.
 - Kotlin 1.5 o superior.
-- Emulador o dispositivo físico con Android 11.0 (API 30) o superior.
+- Emulador o dispositivo físico con Android 15.0 (API 35) o superior.
 
 ### **Pasos**:
 1. Clona este repositorio:
